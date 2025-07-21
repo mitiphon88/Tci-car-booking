@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจองรถ - TCI TREND GROUP</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap');
+
+        :root {
+            --primary-color: #F97316; /* Vibrant Orange from Logo */
+            --primary-dark: #EA580C;
+            --background-start: #F9FAFB; /* Light Gray */
+            --background-end: #F3F4F6;
+            --surface-color: rgba(255, 255, 255, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.3);
+            --text-color: #111827; /* Darker Black for Text */
+            --subtle-text-color: #4b5563;
+            --shadow-color: rgba(249, 115, 22, 0.15);
+            --pending-bg: #fefce8; --pending-text: #a16207;
+            --success-bg: #f0fdf4; --success-text: #16a34a;
+            --danger-bg: #fef2f2;  --danger-text: #dc2626;
+            --completed-bg: #f3f4f6; --completed-text: #4b5563;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .lang-switcher {
+            display: flex;
+            gap: 5px;
+            background: rgba(255,255,255,0.3);
+            padding: 5px;
+            border-radius: 12px;
+        }
+        .lang-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 700;
+            transition: background-color 0.3s, color 0.3s;
+            color: var(--subtle-text-color);
+        }
+        .lang-btn.active {
+            background-color: var(--surface-color);
+            color: var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .page-content {
+            padding: 0 20px 40px 20px;
+        }
+        
+        .glass-card {
+            background: var(--surface-color);
+            backdrop-filter: blur(10px) saturate(150%);
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            border-radius: 20px;
+            border: 1px solid var(--surface-border);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .auth-card {
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .auth-card h2 {
+            color: var(--text-color);
+            font-size: 1.8em;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+        .auth-error {
+            color: var(--danger-text);
+            background-color: var(--danger-bg);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            font-size: 0.9em;
+        }
+        .auth-footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: var(--subtle-text-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .auth-footer .link-primary {
+            color: var(--primary-color);
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .forgot-password-link {
+            text-decoration: none;
+            color: var(--subtle-text-color);
+        }
+        .forgot-password-link:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        #registerContainer { display: none; }
+        #appContainer { display: none; animation: fadeIn 0.5s ease-in-out; }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 12px 20px;
+        }
+        #welcomeMessage {
+            font-weight: 700;
+            color: var(--text-color);
+            background-color: rgba(255,255,255,0.3);
+            padding: 8px 15px;
+            border-radius: 12px;
+        }
+        .logout-btn {
+            background-color: var(--danger-bg);
+            color: var(--danger-text);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Sarabun', sans-serif;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: var(--danger-text);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.3);
+        }
+
+        .view-switcher {
+            display: flex;
+            justify-content: center;
+            padding: 8px;
+            margin-bottom: 30px;
+        }
+        .view-switcher label {
+            flex: 1; padding: 12px 20px; text-align: center; cursor: pointer;
+            border-radius: 12px; transition: all 0.3s ease-in-out; font-weight: 500;
+            color: var(--subtle-text-color);
+            display: none; /* Hide all by default */
+        }
+        .view-switcher input { display: none; }
+        .view-switcher input:checked + label {
+            background-color: var(--primary-color); color: white;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            padding: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px 0 var(--shadow-color);
+        }
+        .card h2 {
+            margin-top: 0; font-size: 1.5em; border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px; margin-bottom: 25px;
+            display: flex; align-items: center; gap: 10px;
+            color: var(--primary-dark);
+        }
+
+        .form-group { margin-bottom: 22px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--subtle-text-color); transition: color 0.3s; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 15px 12px 45px; border: 1px solid var(--border-color);
+            border-radius: 12px; box-sizing: border-box; font-size: 16px; font-family: 'Sarabun', sans-serif;
+            background-color: #ffffff;
+        }
+        .form-group textarea { padding: 12px 15px; }
+        .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.7rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2); }
+        .form-group input:focus ~ i, .form-group select:focus ~ i { color: var(--primary-color); }
+        
+        .submit-btn {
+            background: linear-gradient(45deg, #FDBA74, var(--primary-color)); 
+            color: white; padding: 15px 20px; border: none;
+            border-radius: 12px; cursor: pointer; width: 100%; font-size: 18px; font-weight: 700;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+        }
+        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(249, 115, 22, 0.4); }
+
+        .item-list { list-style: none; padding: 0; margin: 0; }
+        .list-item { background-color: rgba(255,255,255,0.8); border-left: 5px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 15px; transition: box-shadow 0.3s, border-color 0.3s, transform 0.3s; }
+        .list-item:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.07); transform: translateX(5px); }
+        .list-item.status-pending-border { border-left-color: var(--pending-text); }
+        .list-item.status-approved-border { border-left-color: var(--success-text); }
+        .list-item.status-rejected-border { border-left-color: var(--danger-text); }
+        .list-item.status-completed-border { border-left-color: var(--subtle-text-color); }
+        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .item-header strong { font-size: 1.1em; }
+        .item-details { font-size: 0.95em; line-height: 1.7; color: var(--subtle-text-color); }
+        .item-details span { color: var(--text-color); font-weight: 500; }
+        
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 700; text-transform: uppercase; }
+        .status-pending { background-color: var(--pending-bg); color: var(--pending-text); }
+        .status-approved { background-color: var(--success-bg); color: var(--success-text); }
+        .status-rejected { background-color: var(--danger-bg); color: var(--danger-text); }
+        .status-completed { background-color: var(--completed-bg); color: var(--completed-text); }
+
+        .item-actions { margin-top: 20px; display: flex; gap: 10px; align-items: center; }
+        .action-btn { flex-grow: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; transition: transform 0.2s, opacity 0.3s; }
+        .action-btn:hover { transform: translateY(-1px); opacity: 0.9; }
+        .btn-approve { background-color: var(--success-bg); color: var(--success-text); }
+        .btn-reject { background-color: var(--danger-bg); color: var(--danger-text); }
+        .btn-return { background-color: #e5e7eb; color: #374151; }
+        .role-select { padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: white; flex-grow: 2; }
+        .return-photo-thumbnail { width: 100px; height: auto; border-radius: 8px; margin-top: 5px; cursor: pointer; }
+
+        .empty-state { text-align: center; padding: 40px; color: var(--subtle-text-color); }
+        .empty-state i { font-size: 3em; margin-bottom: 15px; opacity: 0.5; }
+
+        #map-container { position: relative; }
+        #map { height: 400px; width: 100%; border-radius: 12px; margin-bottom: 15px; background-color: #e5e7eb; }
+        #directions-panel { font-size: 0.9em; color: var(--subtle-text-color); }
+        #map-error-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(243, 244, 246, 0.9); color: var(--subtle-text-color); display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-radius: 12px; padding: 20px; }
+        #map-error-overlay i { font-size: 3em; margin-bottom: 15px; opacity: 0.5; }
+
+        #notification-container { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 15px 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards; }
+        .toast.success { background-color: #22c55e; }
+        .toast.error { background-color: #ef4444; }
+        .toast.info { background-color: #3b82f6; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        #camera-video { width: 100%; height: auto; border-radius: 12px; margin-bottom: 15px; }
+        #photo-preview-img { max-width: 100%; border-radius: 12px; margin-bottom: 15px; }
+        .cancel-btn { background: none; border: none; color: var(--subtle-text-color); cursor: pointer; margin-top: 15px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+        @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <h1 data-lang-key="companyName">TCI TREND GROUP</h1>
+        <div class="lang-switcher">
+            <button class="lang-btn" data-lang="th">ไทย</button>
+            <button class="lang-btn" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="zh">中文</button>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div id="loginContainer" class="auth-container">
+            <div class="auth-card glass-card">
+                <h2 data-lang-key="loginTitle">เข้าสู่ระบบ</h2>
+                <form id="loginForm" novalidate>
+                    <div class="form-group"><div class="input-wrapper"><i class="fas fa-user"></i><input type="text" id="username" required data-lang-placeholder="usernamePlaceholder"></div></div>
+                    <div class="form-group"><div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="password" required data-lang-placeholder="passwordPlaceholder"></div></div>
+                    <button type="submit" class="submit-btn" data-lang-key="loginButton">เข้าสู่ระบบ</button>
+                    <div id="loginError" class="auth-error"></div>
+                </form>
+                <div class="auth-footer">
+                    <a href="#" id="forgotPasswordLink" class="forgot-password-link" data-lang-key="forgotPassword">ลืมรหัสผ่าน?</a>
+                    <div>
+                        <span data-lang-key="noAccount">ยังไม่มีบัญชี?</span>
+                        <span id="showRegisterLink" class="link-primary" data-lang-key="registerLink">สมัครสมาชิก</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="registerContainer" class="auth-container">
+            <div class="auth-card glass-card">
+                <h2 data-lang-key="registerTitle">สร้างบัญชีใหม่</h2>
+                <form id="registerForm" novalidate>
+                    <div class="form-group"><div class="input-wrapper"><i class="fas fa-user-circle"></i><input type="text" id="registerFullName" required data-lang-placeholder="fullNamePlaceholder"></div></div>
+                    <div class="form-group"><div class="input-wrapper"><i class="fas fa-user"></i><input type="text" id="registerUsername" required data-lang-placeholder="usernamePlaceholder"></div></div>
+                    <div class="form-group"><div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="registerPassword" required data-lang-placeholder="passwordPlaceholder"></div></div>
+                    <button type="submit" class="submit-btn" data-lang-key="registerButton">สมัครสมาชิก</button>
+                    <div id="registerError" class="auth-error"></div>
+                </form>
+                <div class="auth-footer">
+                    <span></span>
+                    <div>
+                        <span data-lang-key="haveAccount">มีบัญชีอยู่แล้ว?</span>
+                        <span id="showLoginLink" class="link-primary" data-lang-key="loginLink">เข้าสู่ระบบ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="appContainer">
+            <div class="main-container">
+                <div class="app-header glass-card">
+                    <div id="welcomeMessage"></div>
+                    <button id="logoutButton" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span data-lang-key="logoutButton">ออกจากระบบ</span></button>
+                </div>
+                <div id="viewSwitcherContainer" class="view-switcher glass-card">
+                    <input type="radio" name="view" id="userViewRadio" value="user" checked>
+                    <label for="userViewRadio" data-lang-key="userView"><i class="fas fa-user-edit"></i> มุมมองผู้ใช้งาน</label>
+                    <input type="radio" name="view" id="approverViewRadio" value="approver">
+                    <label for="approverViewRadio" data-lang-key="approverView"><i class="fas fa-user-shield"></i> มุมมองผู้อนุมัติ</label>
+                    <input type="radio" name="view" id="adminViewRadio" value="admin">
+                    <label for="adminViewRadio" data-lang-key="adminView"><i class="fas fa-user-cog"></i> มุมมองแอดมิน</label>
+                </div>
+                <div id="userView" class="view active">
+                    <div class="main-grid">
+                        <div class="card glass-card">
+                            <h2 data-lang-key="createRequestTitle"><i class="fas fa-plus-circle"></i> สร้างคำขอจองรถ</h2>
+                            <form id="bookingForm" novalidate>
+                                <div class="form-group"><label for="fullName" data-lang-key="requesterNameLabel">ชื่อ-นามสกุล ผู้จอง</label><div class="input-wrapper"><i class="fas fa-user"></i><input type="text" id="fullName" required readonly></div></div>
+                                <div class="form-group"><label for="phone" data-lang-key="phoneLabel">เบอร์โทรศัพท์ติดต่อ</label><div class="input-wrapper"><i class="fas fa-phone"></i><input type="tel" id="phone" required data-lang-placeholder="phonePlaceholder"></div></div>
+                                <div class="form-group"><label for="approver" data-lang-key="approverLabel">ผู้อนุมัติ</label><div class="input-wrapper"><i class="fas fa-user-check"></i><select id="approver" required><option value="" disabled selected data-lang-key="selectOption">-- กรุณาเลือก --</option><option value="Worrapan Kamchalee">Worrapan Kamchalee</option></select></div></div>
+                                <div class="form-group"><label for="carType" data-lang-key="carTypeLabel">ประเภทรถยนต์</label><div class="input-wrapper"><i class="fas fa-car"></i><select id="carType" required><option value="" disabled selected data-lang-key="selectOption">-- กรุณาเลือก --</option><option value="รถเก๋ง (Sedan)">รถเก๋ง (Sedan)</option><option value="รถอเนกประสงค์ (SUV)">รถอเนกประสงค์ (SUV)</option><option value="รถตู้ Toyota (1นฌ4428)">รถตู้ Toyota (1นฌ4428)</option><option value="รถกระบะ (Pickup)">รถกระบะ (Pickup)</option></select></div></div>
+                                <div class="form-group"><label for="startDateTime" data-lang-key="startDateTimeLabel">วันและเวลารับรถ</label><div class="input-wrapper"><i class="fas fa-calendar-alt"></i><input type="datetime-local" id="startDateTime" required></div></div>
+                                <div class="form-group"><label for="endDateTime" data-lang-key="endDateTimeLabel">วันและเวลาคืนรถ</label><div class="input-wrapper"><i class="fas fa-calendar-check"></i><input type="datetime-local" id="endDateTime" required></div></div>
+                                <div class="form-group"><label for="origin" data-lang-key="originLabel">สถานที่ต้นทาง</label><div class="input-wrapper"><i class="fas fa-map-marker-alt"></i><input type="text" id="origin" required data-lang-placeholder="originPlaceholder"></div></div>
+                                <div class="form-group"><label for="destination" data-lang-key="destinationLabel">สถานที่ปลายทาง</label><div class="input-wrapper"><i class="fas fa-flag-checkered"></i><input type="text" id="destination" required data-lang-placeholder="destinationPlaceholder"></div></div>
+                                <div class="form-group"><label for="notes" data-lang-key="purposeLabel">วัตถุประสงค์การเดินทาง</label><textarea id="notes" rows="3" data-lang-placeholder="purposePlaceholder"></textarea></div>
+                                <button type="submit" class="submit-btn" data-lang-key="submitRequestButton">ส่งคำขอจองรถ</button>
+                            </form>
+                        </div>
+                        <div class="card glass-card">
+                            <h2 data-lang-key="routeMapTitle"><i class="fas fa-map-marked-alt"></i> แผนที่เส้นทาง</h2>
+                            <div id="map-container">
+                                <div id="map"></div>
+                                <div id="map-error-overlay">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <p data-lang-key="mapLoadError">ไม่สามารถโหลดแผนที่ได้</p>
+                                    <p style="font-size: 0.9em;" data-lang-key="apiKeyError">กรุณาใส่ API Key ที่ถูกต้องในโค้ดเพื่อเปิดใช้งาน</p>
+                                </div>
+                            </div>
+                            <div id="directions-panel"></div>
+                        </div>
+                    </div>
+                     <div class="card glass-card" style="margin-top: 30px;">
+                        <h2 data-lang-key="myBookingsTitle"><i class="fas fa-list-alt"></i> รายการจองของฉัน</h2>
+                        <div id="myBookingsList" class="item-list"></div>
+                    </div>
+                </div>
+                <div id="approverView" class="view">
+                    <div class="card glass-card">
+                        <h2 data-lang-key="pendingRequestsTitle"><i class="fas fa-tasks"></i> คำขอที่รอดำเนินการ</h2>
+                        <div id="pendingRequestsList" class="item-list"></div>
+                    </div>
+                </div>
+                <div id="adminView" class="view">
+                    <div class="main-grid">
+                        <div class="card glass-card">
+                            <h2 data-lang-key="userManagementTitle"><i class="fas fa-users-cog"></i> การจัดการผู้ใช้งาน</h2>
+                            <div id="userApprovalList" class="item-list"></div>
+                        </div>
+                        <div class="card glass-card">
+                            <h2 data-lang-key="allMembersTitle"><i class="fas fa-address-book"></i> รายชื่อสมาชิกทั้งหมด</h2>
+                            <div id="allMembersList" class="item-list"></div>
+                        </div>
+                    </div>
+                    <div class="card glass-card" style="margin-top: 30px;">
+                        <h2 data-lang-key="allBookingsTitle"><i class="fas fa-globe-americas"></i> ภาพรวมการจองทั้งหมด</h2>
+                        <div id="allBookingsList" class="item-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="notification-container"></div>
+    <div id="cameraModal" class="modal-overlay">
+        <div class="modal-content glass-card">
+            <h2 data-lang-key="returnCarPhotoTitle">ถ่ายรูปคืนรถ</h2>
+            <div id="camera-view">
+                <video id="camera-video" autoplay playsinline></video>
+                <button id="take-photo-btn" class="submit-btn"><i class="fas fa-camera"></i> <span data-lang-key="takePhotoBtn">ถ่ายรูป</span></button>
+            </div>
+            <div id="photo-preview-view" style="display: none;">
+                <canvas id="photo-canvas" style="display: none;"></canvas>
+                <img id="photo-preview-img" src="" alt="Photo Preview">
+                <button id="confirm-return-btn" class="submit-btn"><i class="fas fa-check-circle"></i> <span data-lang-key="confirmReturnBtn">ยืนยันการคืนรถ</span></button>
+            </div>
+            <button id="cancel-camera-btn" class="cancel-btn" data-lang-key="cancelBtn">ยกเลิก</button>
+        </div>
+    </div>
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap" async defer></script>
+    
+    <script>
+        let map;
+        let directionsService;
+        let directionsRenderer;
+        let mapInitialized = false;
+
+        function initMap() {
+            mapInitialized = true;
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
+            const bangkok = new google.maps.LatLng(13.7563, 100.5018);
+            const mapOptions = {
+                zoom: 12,
+                center: bangkok,
+                mapTypeControl: false,
+                streetViewControl: false,
+                styles: [
+                    { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+                    { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+                    { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+                    { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
+                    { featureType: "administrative.land_parcel", stylers: [{ visibility: "off" }] },
+                    { featureType: "poi", elementType: "geometry", stylers: [{ color: "#eeeeee" }] },
+                    { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+                    { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#e5e5e5" }] },
+                    { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+                    { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+                    { featureType: "road.arterial", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+                    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#dadada" }] },
+                    { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+                    { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+                    { featureType: "transit.line", elementType: "geometry", stylers: [{ color: "#e5e5e5" }] },
+                    { featureType: "transit.station", elementType: "geometry", stylers: [{ color: "#eeeeee" }] },
+                    { featureType: "water", elementType: "geometry", stylers: [{ color: "#c9c9c9" }] },
+                    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+                ],
+            };
+            map = new google.maps.Map(document.getElementById("map"), mapOptions);
+            directionsRenderer.setMap(map);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const translations = {
+                th: {
+                    companyName: "TCI TREND GROUP",
+                    loginTitle: "เข้าสู่ระบบ",
+                    usernamePlaceholder: "ชื่อผู้ใช้",
+                    passwordPlaceholder: "รหัสผ่าน",
+                    loginButton: "เข้าสู่ระบบ",
+                    noAccount: "ยังไม่มีบัญชี?",
+                    registerLink: "สมัครสมาชิก",
+                    forgotPassword: "ลืมรหัสผ่าน?",
+                    registerTitle: "สร้างบัญชีใหม่",
+                    fullNamePlaceholder: "ชื่อ-นามสกุล",
+                    registerButton: "สมัครสมาชิก",
+                    haveAccount: "มีบัญชีอยู่แล้ว?",
+                    loginLink: "เข้าสู่ระบบ",
+                    logoutButton: "ออกจากระบบ",
+                    welcomeMessage: "ยินดีต้อนรับ, {name}",
+                    userView: "มุมมองผู้ใช้งาน",
+                    approverView: "มุมมองผู้อนุมัติ",
+                    adminView: "มุมมองแอดมิน",
+                    createRequestTitle: "สร้างคำขอจองรถ",
+                    requesterNameLabel: "ชื่อ-นามสกุล ผู้จอง",
+                    phoneLabel: "เบอร์โทรศัพท์ติดต่อ",
+                    phonePlaceholder: "เช่น 0812345678",
+                    approverLabel: "ผู้อนุมัติ",
+                    selectOption: "-- กรุณาเลือก --",
+                    carTypeLabel: "ประเภทรถยนต์",
+                    startDateTimeLabel: "วันและเวลารับรถ",
+                    endDateTimeLabel: "วันและเวลาคืนรถ",
+                    originLabel: "สถานที่ต้นทาง",
+                    originPlaceholder: "เช่น บริษัท TCI TREND GROUP",
+                    destinationLabel: "สถานที่ปลายทาง",
+                    destinationPlaceholder: "เช่น สนามบินสุวรรณภูมิ",
+                    purposeLabel: "วัตถุประสงค์การเดินทาง",
+                    purposePlaceholder: "เช่น เดินทางไปพบลูกค้าที่...",
+                    submitRequestButton: "ส่งคำขอจองรถ",
+                    routeMapTitle: "แผนที่เส้นทาง",
+                    myBookingsTitle: "รายการจองของฉัน",
+                    pendingRequestsTitle: "คำขอที่รอดำเนินการ",
+                    allBookingsTitle: "ภาพรวมการจองทั้งหมด",
+                    userManagementTitle: "การจัดการผู้ใช้งาน",
+                    allMembersTitle: "รายชื่อสมาชิกทั้งหมด",
+                    pendingUsersTitle: "ผู้ใช้ที่รอการอนุมัติ",
+                    assignRoleLabel: "กำหนดสิทธิ์:",
+                    roleUser: "ผู้ใช้ทั่วไป",
+                    roleApprover: "ผู้อนุมัติ",
+                    roleAdmin: "แอดมิน",
+                    mapLoadError: "ไม่สามารถโหลดแผนที่ได้",
+                    apiKeyError: "กรุณาใส่ API Key ที่ถูกต้องในโค้ดเพื่อเปิดใช้งาน",
+                    noBookings: "ยังไม่มีรายการจอง",
+                    noPendingRequests: "ไม่มีคำขอที่รอดำเนินการ",
+                    noPendingUsers: "ไม่มีผู้ใช้ที่รอการอนุมัติ",
+                    noActiveUsers: "ไม่มีสมาชิกที่ใช้งานอยู่",
+                    noBookingsInSystem: "ยังไม่มีการจองในระบบ",
+                    distance: "ระยะทาง",
+                    duration: "เวลาเดินทางโดยประมาณ",
+                    routeError: "ไม่สามารถคำนวณเส้นทางได้",
+                    approveButton: "อนุมัติ",
+                    rejectButton: "ปฏิเสธ",
+                    returnCarBtn: "คืนรถ",
+                    takePhotoBtn: "ถ่ายรูป",
+                    confirmReturnBtn: "ยืนยันการคืนรถ",
+                    cancelBtn: "ยกเลิก",
+                    returnCarPhotoTitle: "ถ่ายรูปคืนรถ",
+                    carReturnedPhoto: "รูปภาพการคืนรถ",
+                    cameraAccessError: "ไม่สามารถเข้าถึงกล้องได้",
+                    bookingPath: "เส้นทาง",
+                    bookingDateTime: "วันและเวลา",
+                    bookingApprover: "ผู้อนุมัติ",
+                    bookingCar: "ขอใช้รถ",
+                    bookingTo: "ถึง",
+                    bookingPurpose: "วัตถุประสงค์",
+                    invalidCredentialsError: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
+                    pendingApprovalError: "บัญชีของคุณกำลังรอการอนุมัติ",
+                    fillAllFieldsError: "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน",
+                    usernameExistsError: "ชื่อผู้ใช้นี้มีอยู่แล้วในระบบ",
+                    registerSuccess: "สมัครสมาชิกสำเร็จ! กรุณารอการอนุมัติจากผู้ดูแลระบบ",
+                    dateError: "เวลาสิ้นสุดต้องไม่มาก่อนเวลาเริ่ม",
+                    requestSentSuccess: "ส่งคำขอจองรถเรียบร้อยแล้ว",
+                    requestApproved: "คำขออนุมัติแล้ว",
+                    requestRejected: "คำขอปฏิเสธแล้ว",
+                    userApproved: "ผู้ใช้งานได้รับการอนุมัติแล้ว",
+                    userRejected: "ผู้ใช้งานถูกปฏิเสธแล้ว",
+                    carReturnedSuccess: "คืนรถเรียบร้อยแล้ว",
+                    forgotPasswordInfo: "กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน"
+                },
+                en: {
+                    companyName: "TCI TREND GROUP",
+                    loginTitle: "Login",
+                    usernamePlaceholder: "Username",
+                    passwordPlaceholder: "Password",
+                    loginButton: "Login",
+                    noAccount: "No account?",
+                    registerLink: "Register",
+                    forgotPassword: "Forgot Password?",
+                    registerTitle: "Create New Account",
+                    fullNamePlaceholder: "Full Name",
+                    registerButton: "Register",
+                    haveAccount: "Already have an account?",
+                    loginLink: "Login",
+                    logoutButton: "Logout",
+                    welcomeMessage: "Welcome, {name}",
+                    userView: "User View",
+                    approverView: "Approver View",
+                    adminView: "Admin View",
+                    createRequestTitle: "Create Booking Request",
+                    requesterNameLabel: "Requester Name",
+                    phoneLabel: "Phone Number",
+                    phonePlaceholder: "e.g., 0812345678",
+                    approverLabel: "Approver",
+                    selectOption: "-- Please Select --",
+                    carTypeLabel: "Car Type",
+                    startDateTimeLabel: "Start Date & Time",
+                    endDateTimeLabel: "End Date & Time",
+                    originLabel: "Origin",
+                    originPlaceholder: "e.g., TCI TREND GROUP Office",
+                    destinationLabel: "Destination",
+                    destinationPlaceholder: "e.g., Suvarnabhumi Airport",
+                    purposeLabel: "Purpose of Travel",
+                    purposePlaceholder: "e.g., To meet a client...",
+                    submitRequestButton: "Submit Request",
+                    routeMapTitle: "Route Map",
+                    myBookingsTitle: "My Bookings",
+                    pendingRequestsTitle: "Pending Requests",
+                    allBookingsTitle: "All Bookings Overview",
+                    userManagementTitle: "User Management",
+                    allMembersTitle: "All Members List",
+                    pendingUsersTitle: "Pending User Approvals",
+                    assignRoleLabel: "Assign Role:",
+                    roleUser: "User",
+                    roleApprover: "Approver",
+                    roleAdmin: "Admin",
+                    mapLoadError: "Could not load map",
+                    apiKeyError: "Please provide a valid API Key in the code to enable.",
+                    noBookings: "No bookings yet",
+                    noPendingRequests: "No pending requests",
+                    noPendingUsers: "No pending users",
+                    noActiveUsers: "No active members",
+                    noBookingsInSystem: "No bookings in the system yet",
+                    distance: "Distance",
+                    duration: "Est. Duration",
+                    routeError: "Could not calculate the route",
+                    approveButton: "Approve",
+                    rejectButton: "Reject",
+                    returnCarBtn: "Return Car",
+                    takePhotoBtn: "Take Photo",
+                    confirmReturnBtn: "Confirm Return",
+                    cancelBtn: "Cancel",
+                    returnCarPhotoTitle: "Return Car Photo",
+                    carReturnedPhoto: "Return Photo",
+                    cameraAccessError: "Could not access camera",
+                    bookingPath: "Route",
+                    bookingDateTime: "Date & Time",
+                    bookingApprover: "Approver",
+                    bookingCar: "Car",
+                    bookingTo: "To",
+                    bookingPurpose: "Purpose",
+                    invalidCredentialsError: "Invalid username or password",
+                    pendingApprovalError: "Your account is pending approval",
+                    fillAllFieldsError: "Please fill in all required fields",
+                    usernameExistsError: "This username already exists",
+                    registerSuccess: "Registration successful! Please wait for admin approval.",
+                    dateError: "End date cannot be before start date",
+                    requestSentSuccess: "Booking request sent successfully",
+                    requestApproved: "Request approved",
+                    requestRejected: "Request rejected",
+                    userApproved: "User has been approved",
+                    userRejected: "User has been rejected",
+                    carReturnedSuccess: "Car returned successfully",
+                    forgotPasswordInfo: "Please contact the administrator to reset your password."
+                },
+                zh: {
+                    companyName: "TCI 趋势集团",
+                    loginTitle: "登录",
+                    usernamePlaceholder: "用户名",
+                    passwordPlaceholder: "密码",
+                    loginButton: "登录",
+                    noAccount: "没有账户？",
+                    registerLink: "注册",
+                    forgotPassword: "忘记密码？",
+                    registerTitle: "创建新账户",
+                    fullNamePlaceholder: "全名",
+                    registerButton: "注册",
+                    haveAccount: "已有账户？",
+                    loginLink: "登录",
+                    logoutButton: "登出",
+                    welcomeMessage: "欢迎, {name}",
+                    userView: "用户视图",
+                    approverView: "审批人视图",
+                    adminView: "管理员视图",
+                    createRequestTitle: "创建预订请求",
+                    requesterNameLabel: "申请人姓名",
+                    phoneLabel: "电话号码",
+                    phonePlaceholder: "例如 0812345678",
+                    approverLabel: "审批人",
+                    selectOption: "-- 请选择 --",
+                    carTypeLabel: "车辆类型",
+                    startDateTimeLabel: "开始日期和时间",
+                    endDateTimeLabel: "结束日期和时间",
+                    originLabel: "起点",
+                    originPlaceholder: "例如 TCI 趋势集团办公室",
+                    destinationLabel: "终点",
+                    destinationPlaceholder: "例如 素万那普机场",
+                    purposeLabel: "出行目的",
+                    purposePlaceholder: "例如 会见客户...",
+                    submitRequestButton: "提交请求",
+                    routeMapTitle: "路线图",
+                    myBookingsTitle: "我的预订",
+                    pendingRequestsTitle: "待处理的请求",
+                    allBookingsTitle: "所有预订概览",
+                    userManagementTitle: "用户管理",
+                    allMembersTitle: "所有成员列表",
+                    pendingUsersTitle: "待审批的用户",
+                    assignRoleLabel: "分配角色:",
+                    roleUser: "用户",
+                    roleApprover: "审批人",
+                    roleAdmin: "管理员",
+                    mapLoadError: "无法加载地图",
+                    apiKeyError: "请在代码中提供有效的API密钥以启用。",
+                    noBookings: "暂无预订",
+                    noPendingRequests: "没有待处理的请求",
+                    noPendingUsers: "没有待审批的用户",
+                    noActiveUsers: "没有活跃成员",
+                    noBookingsInSystem: "系统中暂无预订",
+                    distance: "距离",
+                    duration: "预计时长",
+                    routeError: "无法计算路线",
+                    approveButton: "批准",
+                    rejectButton: "拒绝",
+                    returnCarBtn: "还车",
+                    takePhotoBtn: "拍照",
+                    confirmReturnBtn: "确认还车",
+                    cancelBtn: "取消",
+                    returnCarPhotoTitle: "还车拍照",
+                    carReturnedPhoto: "还车照片",
+                    cameraAccessError: "无法访问摄像头",
+                    bookingPath: "路线",
+                    bookingDateTime: "日期和时间",
+                    bookingApprover: "审批人",
+                    bookingCar: "车辆",
+                    bookingTo: "至",
+                    bookingPurpose: "目的",
+                    invalidCredentialsError: "用户名或密码无效",
+                    pendingApprovalError: "您的帐户正在等待批准",
+                    fillAllFieldsError: "请填写所有必填字段",
+                    usernameExistsError: "该用户名已存在",
+                    registerSuccess: "注册成功！请等待管理员批准。",
+                    dateError: "结束日期不能早于开始日期",
+                    requestSentSuccess: "预订请求已成功发送",
+                    requestApproved: "请求已批准",
+                    requestRejected: "请求已拒绝",
+                    userApproved: "用户已获批准",
+                    userRejected: "用户已被拒绝",
+                    carReturnedSuccess: "还车成功",
+                    forgotPasswordInfo: "请联系管理员重置您的密码。"
+                }
+            };
+
+            let currentLang = localStorage.getItem('carBooking_language') || 'th';
+
+            const setLanguage = (lang) => {
+                currentLang = lang;
+                localStorage.setItem('carBooking_language', lang);
+                document.documentElement.lang = lang;
+
+                document.querySelectorAll('[data-lang-key]').forEach(el => {
+                    const key = el.getAttribute('data-lang-key');
+                    if (translations[lang][key]) {
+                        el.innerHTML = translations[lang][key];
+                    }
+                });
+                
+                document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-lang-placeholder');
+                    if (translations[lang][key]) {
+                        el.placeholder = translations[lang][key];
+                    }
+                });
+                
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === lang);
+                });
+
+                if(currentUser) {
+                    App.renderAll();
+                    welcomeMessage.textContent = getTranslation('welcomeMessage').replace('{name}', currentUser.fullName);
+                }
+            };
+
+            const getTranslation = (key) => {
+                return translations[currentLang][key] || key;
+            };
+
+            setTimeout(() => {
+                if (!mapInitialized) {
+                    console.error("Google Maps script failed to load. Check API Key.");
+                    const mapErrorOverlay = document.getElementById('map-error-overlay');
+                    if(mapErrorOverlay) {
+                        mapErrorOverlay.style.display = 'flex';
+                    }
+                }
+            }, 3000);
+
+            const notificationContainer = document.getElementById('notification-container');
+            const showNotification = (messageKey, type = 'info') => {
+                const message = getTranslation(messageKey);
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                let iconClass = 'fas fa-info-circle';
+                if (type === 'success') iconClass = 'fas fa-check-circle';
+                if (type === 'error') iconClass = 'fas fa-exclamation-circle';
+                toast.innerHTML = `<i class="${iconClass}"></i> ${message}`;
+                notificationContainer.appendChild(toast);
+                setTimeout(() => { toast.remove(); }, 3000);
+            };
+
+            const Storage = {
+                getUsers: () => JSON.parse(localStorage.getItem('carBooking_users')) || [],
+                saveUsers: (users) => localStorage.setItem('carBooking_users', JSON.stringify(users)),
+                getBookings: () => JSON.parse(localStorage.getItem('carBooking_bookings')) || [],
+                saveBookings: (bookings) => localStorage.setItem('carBooking_bookings', JSON.stringify(bookings)),
+            };
+
+            const initializeData = () => {
+                if (Storage.getUsers().length === 0) {
+                    Storage.saveUsers([
+                        { username: 'test', password: 'test', fullName: 'ผู้ใช้ทดสอบ', role: 'user', status: 'active' },
+                        { username: 'somchai', password: '1234', fullName: 'สมชาย ใจดี', role: 'approver', status: 'active' },
+                        { username: 'worrapan', password: '1234', fullName: 'Worrapan Kamchalee', role: 'approver', status: 'active' },
+                        { username: 'admin', password: 'admin', fullName: 'ผู้ดูแลระบบ', role: 'admin', status: 'active' }
+                    ]);
+                }
+                if (Storage.getBookings().length === 0) {
+                    Storage.saveBookings([
+                        { id: 1, fullName: 'อรัญญา สุขใจ', phone: '0812345678', approver: 'สมชาย ใจดี', carType: 'รถเก๋ง (Sedan)', startDateTime: '2025-07-20T09:00', endDateTime: '2025-07-21T18:00', notes: 'ไปพบลูกค้าที่ระยอง', origin: 'บริษัท TCI TREND GROUP', destination: 'พัทยา', status: 'Pending', returnPhoto: null },
+                        { id: 2, fullName: 'นพดล ตั้งมั่น', phone: '0887654321', approver: 'สมหญิง เก่งมาก', carType: 'รถอเนกประสงค์ (SUV)', startDateTime: '2025-07-22T10:00', endDateTime: '2025-07-22T17:00', notes: 'ไปส่งเอกสารที่ชลบุรี', origin: 'บริษัท TCI TREND GROUP', destination: 'ชลบุรี', status: 'Approved', returnPhoto: null },
+                        { id: 3, fullName: 'ผู้ใช้ทดสอบ', phone: '0899998888', approver: 'สมชาย ใจดี', carType: 'รถกระบะ (Pickup)', startDateTime: '2025-07-25T08:30', endDateTime: '2025-07-26T12:00', notes: 'ขนของไปสาขาใหม่', origin: 'บริษัท TCI TREND GROUP', destination: 'อยุธยา', status: 'Rejected', returnPhoto: null },
+                    ]);
+                }
+            };
+            
+            initializeData();
+            
+            let currentUser = null;
+            let users = Storage.getUsers();
+            let bookings = Storage.getBookings();
+
+            const loginContainer = document.getElementById('loginContainer');
+            const registerContainer = document.getElementById('registerContainer');
+            const appContainer = document.getElementById('appContainer');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginError = document.getElementById('loginError');
+            const registerError = document.getElementById('registerError');
+            const showRegisterLink = document.getElementById('showRegisterLink');
+            const showLoginLink = document.getElementById('showLoginLink');
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            const logoutButton = document.getElementById('logoutButton');
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            const cameraModal = document.getElementById('cameraModal');
+
+            const Auth = {
+                login: (username, password) => {
+                    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+                    if (user) {
+                        if (user.status === 'pending') {
+                            loginError.textContent = getTranslation('pendingApprovalError');
+                            loginError.style.display = 'block';
+                            return;
+                        }
+                        currentUser = user;
+                        loginContainer.style.display = 'none';
+                        registerContainer.style.display = 'none';
+                        appContainer.style.display = 'block';
+                        App.init();
+                    } else {
+                        loginError.textContent = getTranslation('invalidCredentialsError');
+                        loginError.style.display = 'block';
+                    }
+                },
+                register: (fullName, username, password) => {
+                    if (!fullName || !username || !password) {
+                        registerError.textContent = getTranslation('fillAllFieldsError');
+                        registerError.style.display = 'block';
+                        return;
+                    }
+                    if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+                        registerError.textContent = getTranslation('usernameExistsError');
+                        registerError.style.display = 'block';
+                        return;
+                    }
+                    users.push({ fullName, username, password, role: 'user', status: 'pending' });
+                    Storage.saveUsers(users);
+                    showNotification('registerSuccess', 'success');
+                    registerForm.reset();
+                    showLoginLink.click();
+                },
+                logout: () => {
+                    currentUser = null;
+                    appContainer.style.display = 'none';
+                    loginContainer.style.display = 'flex';
+                    loginForm.reset();
+                    loginError.style.display = 'none';
+                }
+            };
+
+            const App = {
+                init: () => {
+                    welcomeMessage.textContent = getTranslation('welcomeMessage').replace('{name}', currentUser.fullName);
+                    App.updateViewSwitcher();
+                    App.DOM.fullNameInput.value = currentUser.fullName;
+                    App.setupEventListeners();
+                    App.renderAll();
+                },
+                DOM: {
+                    bookingForm: document.getElementById('bookingForm'),
+                    myBookingsList: document.getElementById('myBookingsList'),
+                    pendingRequestsList: document.getElementById('pendingRequestsList'),
+                    allBookingsList: document.getElementById('allBookingsList'),
+                    userApprovalList: document.getElementById('userApprovalList'),
+                    allMembersList: document.getElementById('allMembersList'),
+                    viewRadios: document.querySelectorAll('input[name="view"]'),
+                    fullNameInput: document.getElementById('fullName'),
+                    directionsPanel: document.getElementById('directions-panel'),
+                },
+                updateViewSwitcher: () => {
+                    const userLabel = document.querySelector('label[for="userViewRadio"]');
+                    const approverLabel = document.querySelector('label[for="approverViewRadio"]');
+                    const adminLabel = document.querySelector('label[for="adminViewRadio"]');
+                    
+                    userLabel.style.display = 'flex';
+                    approverLabel.style.display = 'none';
+                    adminLabel.style.display = 'none';
+
+                    if (currentUser.role === 'approver') {
+                        approverLabel.style.display = 'flex';
+                    } else if (currentUser.role === 'admin') {
+                        approverLabel.style.display = 'flex';
+                        adminLabel.style.display = 'flex';
+                    }
+                    document.getElementById('userViewRadio').checked = true;
+                    document.getElementById('userView').classList.add('active');
+                    document.getElementById('approverView').classList.remove('active');
+                    document.getElementById('adminView').classList.remove('active');
+                },
+                formatDateTimeToLocale: (dateTimeString) => {
+                    if (!dateTimeString) return '';
+                    const date = new Date(dateTimeString);
+                    const lang = currentLang === 'th' ? 'th-TH' : 'en-GB';
+                    return date.toLocaleString(lang, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+                },
+                renderMyBookings: () => {
+                    App.DOM.myBookingsList.innerHTML = '';
+                    const userBookings = bookings.filter(b => b.fullName === currentUser.fullName).slice().reverse();
+                    if (userBookings.length === 0) {
+                        App.DOM.myBookingsList.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>${getTranslation('noBookings')}</p></div>`;
+                        return;
+                    }
+                    userBookings.forEach(b => {
+                        const item = App.createBookingItem(b, false);
+                        App.DOM.myBookingsList.appendChild(item);
+                    });
+                },
+                renderPendingRequests: () => {
+                    App.DOM.pendingRequestsList.innerHTML = '';
+                    const pending = bookings.filter(b => b.status === 'Pending' && b.approver === currentUser.fullName).reverse();
+                    if (pending.length === 0) {
+                        App.DOM.pendingRequestsList.innerHTML = `<div class="empty-state"><i class="fas fa-check-circle"></i><p>${getTranslation('noPendingRequests')}</p></div>`;
+                        return;
+                    }
+                    pending.forEach(b => {
+                        const item = App.createBookingItem(b, true);
+                        App.DOM.pendingRequestsList.appendChild(item);
+                    });
+                },
+                renderAllBookings: () => {
+                    App.DOM.allBookingsList.innerHTML = '';
+                    const all = bookings.slice().reverse();
+                     if (all.length === 0) {
+                        App.DOM.allBookingsList.innerHTML = `<div class="empty-state"><i class="fas fa-globe-americas"></i><p>${getTranslation('noBookingsInSystem')}</p></div>`;
+                        return;
+                    }
+                    all.forEach(b => {
+                        const item = App.createBookingItem(b, b.status === 'Pending');
+                        App.DOM.allBookingsList.appendChild(item);
+                    });
+                },
+                renderUserApprovals: () => {
+                    App.DOM.userApprovalList.innerHTML = '';
+                    const pendingUsers = users.filter(u => u.status === 'pending');
+                    if (pendingUsers.length === 0) {
+                        App.DOM.userApprovalList.innerHTML = `<div class="empty-state"><i class="fas fa-user-check"></i><p>${getTranslation('noPendingUsers')}</p></div>`;
+                        return;
+                    }
+                    pendingUsers.forEach(u => {
+                        const item = document.createElement('li');
+                        item.className = 'list-item status-pending-border';
+                        item.innerHTML = `
+                            <div class="item-header">
+                                <strong>${u.fullName}</strong>
+                                <span class="status-badge status-pending">Pending</span>
+                            </div>
+                            <div class="item-details">
+                                <i class="fas fa-user"></i> Username: <span>${u.username}</span>
+                            </div>
+                            <div class="item-actions">
+                                <label class="assign-role-label">${getTranslation('assignRoleLabel')}</label>
+                                <select class="role-select" data-username="${u.username}">
+                                    <option value="user">${getTranslation('roleUser')}</option>
+                                    <option value="approver">${getTranslation('roleApprover')}</option>
+                                </select>
+                                <button class="action-btn btn-approve" data-username="${u.username}"><i class="fas fa-check"></i> ${getTranslation('approveButton')}</button>
+                                <button class="action-btn btn-reject" data-username="${u.username}"><i class="fas fa-times"></i> ${getTranslation('rejectButton')}</button>
+                            </div>
+                        `;
+                        App.DOM.userApprovalList.appendChild(item);
+                    });
+                },
+                renderAllUsers: () => {
+                    App.DOM.allMembersList.innerHTML = '';
+                    const activeUsers = users.filter(u => u.status === 'active');
+                    if (activeUsers.length === 0) {
+                        App.DOM.allMembersList.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>${getTranslation('noActiveUsers')}</p></div>`;
+                        return;
+                    }
+                    activeUsers.forEach(u => {
+                        const item = document.createElement('li');
+                        item.className = 'list-item';
+                        const roleKey = 'role' + u.role.charAt(0).toUpperCase() + u.role.slice(1);
+                        item.innerHTML = `
+                            <div class="item-header">
+                                <strong>${u.fullName}</strong>
+                                <span class="status-badge" style="background-color: #e5e7eb; color: #374151;">${getTranslation(roleKey)}</span>
+                            </div>
+                            <div class="item-details">
+                                <i class="fas fa-user-tag"></i> Username: <span>${u.username}</span>
+                            </div>
+                        `;
+                        App.DOM.allMembersList.appendChild(item);
+                    });
+                },
+                createBookingItem: (b, showActions) => {
+                    const statusClass = `status-${b.status.toLowerCase()}`;
+                    const borderClass = `status-${b.status.toLowerCase()}-border`;
+                    const item = document.createElement('li');
+                    item.className = `list-item ${borderClass}`;
+
+                    let actionsHTML = '';
+                    if (showActions) {
+                        actionsHTML = `
+                        <div class="item-actions">
+                            <button class="action-btn btn-approve" data-id="${b.id}"><i class="fas fa-check"></i> ${getTranslation('approveButton')}</button>
+                            <button class="action-btn btn-reject" data-id="${b.id}"><i class="fas fa-times"></i> ${getTranslation('rejectButton')}</button>
+                        </div>`;
+                    } else if (b.status === 'Approved' && b.fullName === currentUser.fullName) {
+                         actionsHTML = `
+                        <div class="item-actions">
+                            <button class="action-btn btn-return" data-id="${b.id}"><i class="fas fa-camera"></i> ${getTranslation('returnCarBtn')}</button>
+                        </div>`;
+                    }
+
+                    const photoHTML = b.returnPhoto ? `
+                        <div class="item-details" style="margin-top: 10px;">
+                            <i class="fas fa-camera"></i> ${getTranslation('carReturnedPhoto')}: 
+                            <img src="${b.returnPhoto}" class="return-photo-thumbnail" alt="Return Photo">
+                        </div>` : '';
+
+
+                    item.innerHTML = `
+                        <div class="item-header"><strong>${b.fullName || b.carType}</strong><span class="status-badge ${statusClass}">${b.status}</span></div>
+                        <div class="item-details">
+                            <i class="fas fa-car"></i> ${getTranslation('bookingCar')}: <span>${b.carType}</span><br>
+                            <i class="fas fa-user-check"></i> ${getTranslation('bookingTo')}: <span>${b.approver}</span><br>
+                            <i class="fas fa-road"></i> ${getTranslation('bookingPath')}: <span>${b.origin || '-'} &rarr; ${b.destination || '-'}</span><br>
+                            <i class="fas fa-calendar-alt"></i> ${getTranslation('bookingDateTime')}: <span>${App.formatDateTimeToLocale(b.startDateTime)} - ${App.formatDateTimeToLocale(b.endDateTime)}</span>
+                        </div>
+                        ${photoHTML}
+                        ${actionsHTML}`;
+                    return item;
+                },
+                renderAll: () => {
+                    App.renderMyBookings();
+                    if (currentUser.role === 'approver' || currentUser.role === 'admin') {
+                        App.renderPendingRequests();
+                    }
+                    if (currentUser.role === 'admin') {
+                        App.renderAllBookings();
+                        App.renderUserApprovals();
+                        App.renderAllUsers();
+                    }
+                },
+                calculateAndDisplayRoute: (origin, destination) => {
+                    if (!mapInitialized || !origin || !destination) return;
+                    directionsService.route(
+                        {
+                            origin: origin,
+                            destination: destination,
+                            travelMode: google.maps.TravelMode.DRIVING,
+                        },
+                        (response, status) => {
+                            if (status === "OK") {
+                                directionsRenderer.setDirections(response);
+                                const route = response.routes[0].legs[0];
+                                App.DOM.directionsPanel.innerHTML = `<strong>${getTranslation('distance')}:</strong> ${route.distance.text}<br><strong>${getTranslation('duration')}:</strong> ${route.duration.text}`;
+                            } else {
+                                showNotification('routeError', "error");
+                                App.DOM.directionsPanel.innerHTML = "";
+                            }
+                        }
+                    );
+                },
+                handleApprovalAction: (e) => {
+                    const button = e.target.closest('.action-btn');
+                    if (!button) return;
+                    const bookingId = parseInt(button.dataset.id);
+                    const action = button.classList.contains('btn-approve') ? 'Approved' : 'Rejected';
+                    const bookingIndex = bookings.findIndex(b => b.id === bookingId);
+                    if (bookingIndex > -1) {
+                        bookings[bookingIndex].status = action;
+                        Storage.saveBookings(bookings);
+                        App.renderAll();
+                        showNotification(action === 'Approved' ? 'requestApproved' : 'requestRejected', 'info');
+                    }
+                },
+                handleUserApprovalAction: (e) => {
+                    const button = e.target.closest('.action-btn');
+                    if (!button) return;
+                    const username = button.dataset.username;
+                    const userIndex = users.findIndex(u => u.username === username);
+
+                    if (userIndex === -1) return;
+
+                    if (button.classList.contains('btn-approve')) {
+                        const roleSelect = document.querySelector(`.role-select[data-username="${username}"]`);
+                        users[userIndex].status = 'active';
+                        users[userIndex].role = roleSelect.value;
+                        Storage.saveUsers(users);
+                        App.renderUserApprovals();
+                        App.renderAllUsers();
+                        showNotification('userApproved', 'success');
+                    } else if (button.classList.contains('btn-reject')) {
+                        users.splice(userIndex, 1);
+                        Storage.saveUsers(users);
+                        App.renderUserApprovals();
+                        App.renderAllUsers();
+                        showNotification('userRejected', 'info');
+                    }
+                },
+                setupEventListeners: () => {
+                    App.DOM.bookingForm.onsubmit = (e) => {
+                        e.preventDefault();
+                        const newBooking = {
+                            id: Date.now(),
+                            fullName: currentUser.fullName,
+                            phone: document.getElementById('phone').value.trim(),
+                            approver: document.getElementById('approver').value,
+                            carType: document.getElementById('carType').value,
+                            startDateTime: document.getElementById('startDateTime').value,
+                            endDateTime: document.getElementById('endDateTime').value,
+                            origin: document.getElementById('origin').value.trim(),
+                            destination: document.getElementById('destination').value.trim(),
+                            notes: document.getElementById('notes').value.trim(),
+                            status: 'Pending',
+                            returnPhoto: null
+                        };
+
+                        if (!newBooking.phone || !newBooking.approver || !newBooking.carType || !newBooking.startDateTime || !newBooking.endDateTime || !newBooking.origin || !newBooking.destination) {
+                            showNotification('fillAllFieldsError', 'error'); return;
+                        }
+                        if (new Date(newBooking.endDateTime) < new Date(newBooking.startDateTime)) {
+                            showNotification('dateError', 'error'); return;
+                        }
+                        
+                        bookings.push(newBooking);
+                        Storage.saveBookings(bookings);
+                        App.renderAll();
+                        App.calculateAndDisplayRoute(newBooking.origin, newBooking.destination);
+                        App.DOM.bookingForm.reset();
+                        App.DOM.fullNameInput.value = currentUser.fullName;
+                        showNotification('requestSentSuccess', 'success');
+                    };
+
+                    App.DOM.pendingRequestsList.onclick = App.handleApprovalAction;
+                    App.DOM.allBookingsList.onclick = App.handleApprovalAction;
+                    App.DOM.userApprovalList.onclick = App.handleUserApprovalAction;
+                    App.DOM.myBookingsList.onclick = (e) => {
+                        const returnBtn = e.target.closest('.btn-return');
+                        if (returnBtn) {
+                            const bookingId = parseInt(returnBtn.dataset.id);
+                            Camera.open(bookingId);
+                        }
+                    };
+                }
+            };
+
+            const Camera = {
+                videoStream: null,
+                currentBookingId: null,
+                elements: {
+                    modal: document.getElementById('cameraModal'),
+                    video: document.getElementById('camera-video'),
+                    canvas: document.getElementById('photo-canvas'),
+                    photoPreview: document.getElementById('photo-preview-img'),
+                    cameraView: document.getElementById('camera-view'),
+                    previewView: document.getElementById('photo-preview-view'),
+                    takePhotoBtn: document.getElementById('take-photo-btn'),
+                    confirmReturnBtn: document.getElementById('confirm-return-btn'),
+                    cancelBtn: document.getElementById('cancel-camera-btn'),
+                },
+                open: (bookingId) => {
+                    Camera.currentBookingId = bookingId;
+                    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                        .then(stream => {
+                            Camera.videoStream = stream;
+                            Camera.elements.video.srcObject = stream;
+                            Camera.elements.cameraView.style.display = 'block';
+                            Camera.elements.previewView.style.display = 'none';
+                            Camera.elements.modal.style.display = 'flex';
+                        })
+                        .catch(err => {
+                            console.error("Camera Error:", err);
+                            showNotification('cameraAccessError', 'error');
+                        });
+                },
+                close: () => {
+                    if (Camera.videoStream) {
+                        Camera.videoStream.getTracks().forEach(track => track.stop());
+                    }
+                    Camera.elements.modal.style.display = 'none';
+                },
+                takePhoto: () => {
+                    const video = Camera.elements.video;
+                    const canvas = Camera.elements.canvas;
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const context = canvas.getContext('2d');
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    const dataUrl = canvas.toDataURL('image/jpeg');
+                    Camera.elements.photoPreview.src = dataUrl;
+                    
+                    Camera.elements.cameraView.style.display = 'none';
+                    Camera.elements.previewView.style.display = 'block';
+                    if (Camera.videoStream) {
+                        Camera.videoStream.getTracks().forEach(track => track.stop());
+                    }
+                },
+                confirmReturn: () => {
+                    const photoDataUrl = Camera.elements.photoPreview.src;
+                    const bookingIndex = bookings.findIndex(b => b.id === Camera.currentBookingId);
+                    if (bookingIndex > -1) {
+                        bookings[bookingIndex].status = 'Completed';
+                        bookings[bookingIndex].returnPhoto = photoDataUrl;
+                        Storage.saveBookings(bookings);
+                        App.renderAll();
+                        showNotification('carReturnedSuccess', 'success');
+                        Camera.close();
+                    }
+                },
+                setupEventListeners: () => {
+                    Camera.elements.takePhotoBtn.onclick = Camera.takePhoto;
+                    Camera.elements.confirmReturnBtn.onclick = Camera.confirmReturn;
+                    Camera.elements.cancelBtn.onclick = Camera.close;
+                }
+            };
+            Camera.setupEventListeners();
+
+            showRegisterLink.addEventListener('click', () => { loginContainer.style.display = 'none'; registerContainer.style.display = 'flex'; });
+            showLoginLink.addEventListener('click', () => { registerContainer.style.display = 'none'; loginContainer.style.display = 'flex'; });
+            forgotPasswordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showNotification('forgotPasswordInfo', 'info');
+            });
+            loginForm.addEventListener('submit', (e) => { e.preventDefault(); Auth.login(document.getElementById('username').value, document.getElementById('password').value); });
+            registerForm.addEventListener('submit', (e) => { e.preventDefault(); Auth.register(document.getElementById('registerFullName').value, document.getElementById('registerUsername').value, document.getElementById('registerPassword').value); });
+            logoutButton.addEventListener('click', Auth.logout);
+            App.DOM.viewRadios.forEach(radio => { radio.addEventListener('change', (e) => { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(`${e.target.value}View`).classList.add('active'); }); });
+            
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            const nowString = now.toISOString().slice(0,16);
+            document.getElementById('startDateTime').setAttribute('min', nowString);
+            document.getElementById('endDateTime').setAttribute('min', nowString);
+            document.getElementById('startDateTime').addEventListener('change', function() { document.getElementById('endDateTime').setAttribute('min', this.value); });
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    setLanguage(e.target.dataset.lang);
+                });
+            });
+
+            setLanguage(currentLang);
+        });
+    </script>
+</body>
+</html>
